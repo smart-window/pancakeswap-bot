@@ -2,6 +2,7 @@ var ethers = require('ethers');
 var Web3 = require("web3");
 const abiDecoder = require('abi-decoder'); // NodeJS
 const testABI = require("./ABI.json")
+const erc20ABI = require("./erc20.abi.json")
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -52,6 +53,16 @@ const subscription = web3.eth.subscribe("pendingTransactions", (err, res) => {
     if (err) console.error(err);
 });
 
+
+const getBalance = async (tokenAddress) => {
+    const contract = new web3.eth.Contract(erc20ABI, tokenAddress);
+    const result = await contract.methods.balanceOf(process.env.YOUR_ADDRESS).call();
+    const format = web3.utils.fromWei(result);
+    console.log(tokenAddress)
+    console.log(format);
+    console.log(result);
+}
+
 var init = function () {
     subscription.on("data", (txHash) => {
         setTimeout(async () => {
@@ -91,15 +102,21 @@ var init = function () {
                                     'nonce': null, //set you want buy at where position in blocks
                                     'value': amountIn
                                 });
-                            let buy_tx = await web3.eth.getTransaction(buy_tx_hash.hash);
+                            // let buy_tx = await web3.eth.getTransaction(buy_tx_hash.hash);
 
-                            console.log(buy_tx)
-                            // console.log(abiDecoder.decodeMethod(buy_tx.data))
-                            // console.log(parseInt(buy_tx.value._hex.toString(), 16))
+                            // let log = await web3.eth.getTransactionReceipt(buy_tx_hash.hash);
+                            // web3.eth.Contract().getPast
+                            // getBalance()
+                            // console.log(buy_tx)
+                            // console.log(abiDecoder.decodeMethod(buy_tx.input))
+                            // console.log(abiDecoder.decodeMethod(buy_tx.input).params)
+                            // console.log(buy_tx_hash)
+                            // console.log(abiDecoder.decodeMethod(buy_tx_hash.data))
+                            // await getBalance(tokenOut)
                             // const sell_tx = await router.swapExactTokensForETH( //uncomment here if you want to buy token
                             //     amountIn,
                             //     0,
-                            //     [tokenIn, tokenOut],
+                            //     [tokenOut, tokenIn],
                             //     process.env.YOUR_ADDRESS,
                             //     Date.now() + 1000 * 60 * 5, // 5 minutes
                             // );
